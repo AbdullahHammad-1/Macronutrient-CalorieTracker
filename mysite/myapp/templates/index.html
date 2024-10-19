@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Tracker</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: orange;
+            text-shadow: 2px 2px 5px black;
+        }
+        .tiger-theme {
+            background-image: url('https://cdn.pixabay.com/photo/2017/09/19/09/28/tiger-2764663_960_720.jpg'); /* Add tiger-themed background */
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+        }
+        .left-half, .pie-chart {
+            width: 45%;
+        }
+        .left-half {
+            margin-right: 20px;
+        }
+        select, button {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        select {
+            width: 100%;
+            background-color: #333;
+            color: white;
+        }
+        button {
+            background-color: #ff5733;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+        }
+        th {
+            background-color: #444;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #333;
+        }
+        tr:nth-child(odd) {
+            background-color: #2a2a2a;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #ff5733;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #333;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .progress {
+            height: 25px;
+            text-align: center;
+            border-radius: 10px;
+            line-height: 25px;
+            color: white;
+        }
+        .perfect {
+            background-color: #28a745;
+        }
+        .exceeded {
+            background-color: #dc3545;
+            direction: rtl;
+        }
+        .delete-button {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pie-chart {
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="tiger-theme">
+        <h1>Calorie Tracker - Tiger Style</h1>
+    </div>
+
+    <div class="container">
+        <div class="left-half">
+            <form method="POST">
+                {% csrf_token %}
+                <select name="food_consumed" id="food_consumed">
+                    <option disabled selected>Select food...</option>
+                    {% for food in foods %}
+                    <option value="{{ food.id }}">{{ food.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Add Food</button>
+            </form>
+
+            <div class="progress-bar">
+                <div class="progress {% if exceeded %}exceeded{% else %}perfect{% endif %}" style="width: {{ cal_percentage }}%;">
+                    {% if exceeded %}
+                    Calories Exceeded: {{ total_cals }} cals
+                    {% else %}
+                    Perfect: {{ total_cals }} cals
+                    {% endif %}
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Food</th>
+                        <th>Proteins (g)</th>
+                        <th>Carbs (g)</th>
+                        <th>Fats (g)</th>
+                        <th>Calories</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consumed in consumed_food %}
+                    <tr>
+                        <td>{{ consumed.food_consumed.name }}</td>
+                        <td>{{ consumed.food_consumed.proteins }}</td>
+                        <td>{{ consumed.food_consumed.carbs }}</td>
+                        <td>{{ consumed.food_consumed.fats }}</td>
+                        <td>{{ consumed.food_consumed.cals }}</td>
+                        <td><a href="{% url 'delete' consumed.id %}"><button class="delete-button">Delete</button></a></td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td><strong>Total</strong></td>
+                        <td>{{ total_proteins }}</td>
+                        <td>{{ total_carbs }}</td>
+                        <td>{{ total_fats }}</td>
+                        <td>{{ total_cals }}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pie-chart">
+            <h2>Macronutrient Breakdown</h2>
+            <canvas id="caloriePieChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const data = {
+            labels: ['Proteins', 'Carbs', 'Fats'],
+            datasets: [{
+                label: 'Macronutrients',
+                data: [{{ total_proteins }}, {{ total_carbs }}, {{ total_fats }}],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                hoverOffset: 4
+            }]
+        };
+        const config = {
+            type: 'pie',
+            data: data,
+        };
+        new Chart(document.getElementById('caloriePieChart'), config);
+    </script>
+</body>
+</html>

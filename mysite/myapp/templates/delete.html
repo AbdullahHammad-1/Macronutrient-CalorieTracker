@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Confirmation</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: orange;
+            text-shadow: 2px 2px 5px #000;
+        }
+        .tiger-theme {
+            background-image: url('path_to_tiger_image');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .form-container {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button {
+            background-color: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="tiger-theme">
+        <h1>Calorie Tracker - Tiger Style</h1>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <p>Are you sure you want to delete this food?</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
